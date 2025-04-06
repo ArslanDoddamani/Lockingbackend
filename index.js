@@ -15,8 +15,23 @@ const tableData = [
   { id: 3, name: 'Row 3', value: 'C' }
 ];
 
+const LOCK_EXPIRY_MINUTES = 5;
+
 // In-memory lock store: { [rowId]: { lockedBy, lockedAt } }
 const rowLocks = {};
+
+setInterval(() => {
+  const now = new Date();
+  for (const rowId in rowLocks) {
+    const { lockedAt } = rowLocks[rowId];
+    const ageMin = (now - new Date(lockedAt)) / (1000 * 60);
+    if (ageMin > LOCK_EXPIRY_MINUTES) {
+      console.log(`🔓 Auto-expiring lock on row ${rowId}`);
+      delete rowLocks[rowId];
+      broadcast({ type: 'unlock', rowId: Number(rowId) });
+    }
+  }
+}, 60 * 1000);
 
 // === API Routes ===
 
