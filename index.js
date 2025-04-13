@@ -15,11 +15,13 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
-let table = [
-  { id: 1, name: 'Item 1', value: 'A', lockedBy: null, lockedAt: null },
-  { id: 2, name: 'Item 2', value: 'B', lockedBy: null, lockedAt: null },
-  { id: 3, name: 'Item 3', value: 'C', lockedBy: null, lockedAt: null }
-];
+let table = Array.from({ length: 100 }, (_, i) => ({
+  id: i + 1,
+  name: `Item ${i + 1}`,
+  value: `${String.fromCharCode(65 + (i % 26))}${i}`, // Cycles through A-Z
+  lockedBy: null,
+  lockedAt: null
+}));
 
 const LOCK_EXPIRE_MS = 5 * 60 * 1000; // 5 minutes
 
